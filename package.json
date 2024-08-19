@@ -1,0 +1,44 @@
+{
+  "name": "@projectdysnomia/libsodium",
+  "version": "0.0.1",
+  "description": "A minimal libsodium wrapper for Project Dysnomia",
+  "main": "index.js",
+  "type": "commonjs",
+  "types": "./index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/projectdysnomia/libsodium.git"
+  },
+  "author": "Project Dysnomia Contributors",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/projectdysnomia/libsodium/issues"
+  },
+  "homepage": "https://github.com/projectdysnomia/libsodium#readme",
+  "peerDependencies": {
+    "sodium-native": "^4.1.1"
+  },
+  "peerDependenciesMeta": {
+    "sodium-native": {
+      "optional": true
+    }
+  },
+  "exports": {
+    ".": {
+      "default": "./index.js",
+      "types": "./index.d.ts"
+    },
+    "./*": "./*",
+    "./native": {
+      "default": "./native.js",
+      "types": "./index.d.ts"
+    },
+    "./wasm": {
+      "default": "./wasm.js",
+      "types": "./index.d.ts"
+    }
+  }
+}
