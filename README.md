@@ -10,7 +10,6 @@ This is achieved by using the following libraries:
     - Only `crypto_aead_xchacha20poly1305_ietf_*` (sans `crypto_aead_xchacha20poly1305_ietf_keygen`) and `sodium_init` methods are exposed in the WASM binary
 
 ## Installation
-Note that
 ```sh
 # install with the WASM backend bundled by default
 npm install @projectdysnomia/libsodium
