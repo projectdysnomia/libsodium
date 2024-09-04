@@ -46,6 +46,13 @@ class WASMBufferPointer {
     }
 }
 
+const _retValBuffer = new WASMBufferPointer(_malloc(4), 4); // used for storing return values of ull*
+
+const checkedCall = (ret, functionName) => {
+    if (ret !== 0) throw new Error(`call to ${functionName} failed`);
+    return ret;
+}
+
 /**
  * @type {import("./index")}
  */
@@ -71,19 +78,37 @@ module.exports = {
     crypto_aead_xchacha20poly1305_ietf_NSECBYTES: _crypto_aead_xchacha20poly1305_ietf_nsecbytes(),
 
     crypto_aead_xchacha20poly1305_ietf_decrypt(m, nsec, c, ad, npub, k) {
-        return _crypto_aead_xchacha20poly1305_ietf_decrypt(m._ptr, m._byteLength, +nsec, c._ptr, c._byteLength, ad?._ptr ?? 0, ad?._byteLength ?? 0, npub._ptr, k._ptr);
+        checkedCall(
+            _crypto_aead_xchacha20poly1305_ietf_decrypt(m._ptr, _retValBuffer._ptr, +nsec, c._ptr, c._byteLength, ad?._ptr ?? 0, ad?._byteLength ?? 0, npub._ptr, k._ptr),
+            "crypto_aead_xchacha20poly1305_ietf_decrypt",
+        );
+
+        return _retValBuffer.buffer.readUInt32LE(0);
     },
 
     crypto_aead_xchacha20poly1305_ietf_decrypt_detached(m, nsec, c, mac, ad, npub, k) {
-        return _crypto_aead_xchacha20poly1305_ietf_decrypt_detached(m._ptr, +nsec, c._ptr, c._byteLength, mac._ptr, ad?._ptr ?? 0, ad?._byteLength ?? 0, npub._ptr, k._ptr);
+        return checkedCall(
+            _crypto_aead_xchacha20poly1305_ietf_decrypt_detached(m._ptr, +nsec, c._ptr, c._byteLength, mac._ptr, ad?._ptr ?? 0, ad?._byteLength ?? 0, npub._ptr, k._ptr),
+            "crypto_aead_xchacha20poly1305_ietf_decrypt_detached",
+        )
     },
 
     crypto_aead_xchacha20poly1305_ietf_encrypt(c, m, ad, nsec, npub, k) {
-        return _crypto_aead_xchacha20poly1305_ietf_encrypt(c._ptr, c._byteLength, m._ptr, m._byteLength, ad?._ptr ?? 0, ad?._byteLength ?? 0, +nsec, npub._ptr, k._ptr);
+        checkedCall(
+            _crypto_aead_xchacha20poly1305_ietf_encrypt(c._ptr, _retValBuffer._ptr, m._ptr, m._byteLength, ad?._ptr ?? 0, ad?._byteLength ?? 0, +nsec, npub._ptr, k._ptr),
+            "crypto_aead_xchacha20poly1305_ietf_encrypt",
+        );
+
+        return _retValBuffer.buffer.readUInt32LE(0);
     },
 
     crypto_aead_xchacha20poly1305_ietf_encrypt_detached(c, mac, m, ad, nsec, npub, k) {
-        return _crypto_aead_xchacha20poly1305_ietf_encrypt_detached(c._ptr, mac._ptr, mac._byteLength, m._ptr, m._byteLength, ad?._ptr ?? 0, ad?._byteLength ?? 0, +nsec, npub._ptr, k._ptr);
+        checkedCall(
+            _crypto_aead_xchacha20poly1305_ietf_encrypt_detached(c._ptr, mac._ptr, _retValBuffer._ptr, m._ptr, m._byteLength, ad?._ptr ?? 0, ad?._byteLength ?? 0, +nsec, npub._ptr, k._ptr),
+            "crypto_aead_xchacha20poly1305_ietf_encrypt_detached",
+        );
+
+        return _retValBuffer.buffer.readUInt32LE(0);
     },
 
     native: false,
