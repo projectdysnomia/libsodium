@@ -39,8 +39,7 @@ class WASMBufferPointer {
         _free(this._ptr);
     }
 
-    subarray(start, end) {
-        if (end === undefined) end = this._byteLength;
+    subarray(start, end = this._byteLength) {
         if (start > end) throw new RangeError("start must be less than or equal to end");
         return new WASMBufferPointer(this._ptr + start, end - start);
     }
