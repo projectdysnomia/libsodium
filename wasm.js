@@ -46,7 +46,7 @@ class WASMBufferPointer {
     }
 }
 
-const _retValBuffer = new WASMBufferPointer(_malloc(8), 4); // used for storing return values of ull*
+const _retValBuffer = new WASMBufferPointer(_malloc(8), 8); // used for storing return values of ull*
 
 const checkedCall = (ret, functionName) => {
     if (ret !== 0) throw new Error(`call to ${functionName} failed`);
