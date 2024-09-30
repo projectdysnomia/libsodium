@@ -46,7 +46,7 @@ class WASMBufferPointer {
     }
 }
 
-const _retValBuffer = new WASMBufferPointer(_malloc(4), 4); // used for storing return values of ull*
+const _retValBuffer = new WASMBufferPointer(_malloc(8), 4); // used for storing return values of ull*
 
 const checkedCall = (ret, functionName) => {
     if (ret !== 0) throw new Error(`call to ${functionName} failed`);
@@ -79,7 +79,7 @@ module.exports = {
 
     crypto_aead_xchacha20poly1305_ietf_decrypt(m, nsec, c, ad, npub, k) {
         checkedCall(
-            _crypto_aead_xchacha20poly1305_ietf_decrypt(m._ptr, _retValBuffer._ptr, +nsec, c._ptr, c._byteLength, ad?._ptr ?? 0, ad?._byteLength ?? 0, npub._ptr, k._ptr),
+            _crypto_aead_xchacha20poly1305_ietf_decrypt(m._ptr, _retValBuffer._ptr, +nsec, c._ptr, c._byteLength, 0, ad?._ptr ?? 0, ad?._byteLength ?? 0, 0, npub._ptr, k._ptr),
             "crypto_aead_xchacha20poly1305_ietf_decrypt",
         );
 
@@ -88,14 +88,14 @@ module.exports = {
 
     crypto_aead_xchacha20poly1305_ietf_decrypt_detached(m, nsec, c, mac, ad, npub, k) {
         return checkedCall(
-            _crypto_aead_xchacha20poly1305_ietf_decrypt_detached(m._ptr, +nsec, c._ptr, c._byteLength, mac._ptr, ad?._ptr ?? 0, ad?._byteLength ?? 0, npub._ptr, k._ptr),
+            _crypto_aead_xchacha20poly1305_ietf_decrypt_detached(m._ptr, +nsec, c._ptr, c._byteLength, 0, mac._ptr, ad?._ptr ?? 0, ad?._byteLength ?? 0, 0, npub._ptr, k._ptr),
             "crypto_aead_xchacha20poly1305_ietf_decrypt_detached",
         )
     },
 
     crypto_aead_xchacha20poly1305_ietf_encrypt(c, m, ad, nsec, npub, k) {
         checkedCall(
-            _crypto_aead_xchacha20poly1305_ietf_encrypt(c._ptr, _retValBuffer._ptr, m._ptr, m._byteLength, ad?._ptr ?? 0, ad?._byteLength ?? 0, +nsec, npub._ptr, k._ptr),
+            _crypto_aead_xchacha20poly1305_ietf_encrypt(c._ptr, _retValBuffer._ptr, m._ptr, m._byteLength, 0, ad?._ptr ?? 0, ad?._byteLength ?? 0, 0, +nsec, npub._ptr, k._ptr),
             "crypto_aead_xchacha20poly1305_ietf_encrypt",
         );
 
@@ -104,7 +104,7 @@ module.exports = {
 
     crypto_aead_xchacha20poly1305_ietf_encrypt_detached(c, mac, m, ad, nsec, npub, k) {
         checkedCall(
-            _crypto_aead_xchacha20poly1305_ietf_encrypt_detached(c._ptr, mac._ptr, _retValBuffer._ptr, m._ptr, m._byteLength, ad?._ptr ?? 0, ad?._byteLength ?? 0, +nsec, npub._ptr, k._ptr),
+            _crypto_aead_xchacha20poly1305_ietf_encrypt_detached(c._ptr, mac._ptr, _retValBuffer._ptr, m._ptr, m._byteLength, 0, ad?._ptr ?? 0, ad?._byteLength ?? 0, 0, +nsec, npub._ptr, k._ptr),
             "crypto_aead_xchacha20poly1305_ietf_encrypt_detached",
         );
 
