@@ -108,6 +108,14 @@ declare namespace LibSodium {
      * @param k Pointer to the encryption key
      */
     export function crypto_aead_xchacha20poly1305_ietf_encrypt_detached(c: BufferPointer, mac: BufferPointer, m: BufferPointer, ad: BufferPointer | null, nsec: null, npub: BufferPointer, k: BufferPointer): number;
+    /**
+     * Whether the native backend is loaded or not
+     */
+    export const native: boolean;
+    /**
+     * Whether the WASM backend is loaded or not
+     */
+    export const wasm: boolean;
 }
 
 export = LibSodium;
