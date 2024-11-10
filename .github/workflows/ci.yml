@@ -1,0 +1,29 @@
+name: Project build
+on: [ pull_request ]
+
+jobs:
+  build:
+    name: Build the project
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with: 
+          node-version: lts/*
+      - name: Setup Emscripten SDK
+        uses: mymindstorm/setup-emsdk@v14
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+      - name: Build libsodium for WASM
+        run: ./scripts/build-libsodium.sh
+      - name: Package the project
+        run: |
+            mkdir gha-dist
+            npm pack --output gha-dist/
+      - name: Upload the package as an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: packaged-tarball
+          path:
+            gha-dist/*.tgz
