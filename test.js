@@ -27,18 +27,24 @@ const SAMPLE_AUTH_TAG_LENGTH = 32;
  * @param {import(".")} mod 
  */
 async function testMod(ctx, mod) {
-    await ctx.test("allocates 1024 null bytes", () => {
+    await ctx.test("allocates 1024 null bytes", ctx => {
         const buf = mod.alloc(1024);
+        ctx.after(() => buf.free());
+
         assert.strict(buf.buffer.equals(KB_NULL), "the buffer is not full of zeroes");
     });
 
-    await ctx.test("transfers a buffer", () => {
+    await ctx.test("transfers a buffer", ctx => {
         const buf = mod.transfer(KB_ONES);
+        ctx.after(() => buf.free());
+
         assert.strict(buf.buffer.equals(KB_ONES), "the buffer is not full of ones");
     });
 
-    await ctx.test("can make a subarray", () => {
+    await ctx.test("can make a subarray", ctx => {
         const buf = mod.transfer(KB_ONES);
+        ctx.after(() => buf.free());
+
         const sub = buf.subarray(0, 512);
         assert.strictEqual(sub.buffer.byteLength, 512, "the subarray has incorrect length");
         assert.strict(sub.buffer.equals(KB_ONES.subarray(0, 512)), "the subarray has incorrect contents");
@@ -51,13 +57,12 @@ async function testMod(ctx, mod) {
         assert.strictEqual(mod.crypto_aead_xchacha20poly1305_ietf_NSECBYTES, EXPECTED_NSECBYTES, "NSECBYTES is incorrect");
     });
 
-    await ctx.test("encrypts a buffer in combined mode", () => {
+    await ctx.test("encrypts a buffer in combined mode", ctx => {
         const buf = mod.alloc(SAMPLE_DATA.byteLength + EXPECTED_ABYTES);
         const cleartextBuf = mod.transfer(SAMPLE_DATA);
         const ad = mod.alloc(SAMPLE_AUTH_TAG_LENGTH);
         const npub = mod.alloc(EXPECTED_NPUBBYTES);
         const k = mod.alloc(EXPECTED_KEYBYTES);
-
         ctx.after(() => {
             buf.free();
             cleartextBuf.free();
@@ -72,20 +77,19 @@ async function testMod(ctx, mod) {
         assert.strict(buf.buffer.equals(ENCRYPTED_SAMPLE_DATA_COMBINED), "the encrypted data is incorrect");
     });
 
-    await ctx.test("decrypts a buffer in combined mode", () => {
+    await ctx.test("decrypts a buffer in combined mode", ctx => {
         const cleartextBuf = mod.alloc(ENCRYPTED_SAMPLE_DATA_COMBINED.byteLength - EXPECTED_ABYTES);
         const buf = mod.transfer(ENCRYPTED_SAMPLE_DATA_COMBINED);
         const ad = mod.alloc(SAMPLE_AUTH_TAG_LENGTH);
         const npub = mod.alloc(EXPECTED_NPUBBYTES);
         const k = mod.alloc(EXPECTED_KEYBYTES);
-
         ctx.after(() => {
             cleartextBuf.free();
             buf.free();
             ad.free();
             npub.free();
             k.free();
-        })
+        });
 
         const v = mod.crypto_aead_xchacha20poly1305_ietf_decrypt(cleartextBuf, null, buf, ad, npub, k);
 
@@ -93,14 +97,13 @@ async function testMod(ctx, mod) {
         assert.strict(cleartextBuf.buffer.equals(SAMPLE_DATA), "the decrypted data is incorrect");
     });
 
-    await ctx.test("encrypts a buffer in detached mode", () => {
+    await ctx.test("encrypts a buffer in detached mode", ctx => {
         const buf = mod.alloc(SAMPLE_DATA.byteLength);
         const mac = mod.alloc(EXPECTED_ABYTES);
         const cleartextBuf = mod.transfer(SAMPLE_DATA);
         const ad = mod.alloc(SAMPLE_AUTH_TAG_LENGTH);
         const npub = mod.alloc(EXPECTED_NPUBBYTES);
         const k = mod.alloc(EXPECTED_KEYBYTES);
-
         ctx.after(() => {
             buf.free();
             mac.free();
@@ -116,14 +119,13 @@ async function testMod(ctx, mod) {
         assert.strict(buf.buffer.equals(ENCRYPTED_SAMPLE_DATA), "the encrypted data is incorrect");
     });
 
-    await ctx.test("decrypts a buffer in detached mode", () => {
+    await ctx.test("decrypts a buffer in detached mode", ctx => {
         const cleartextBuf = mod.alloc(SAMPLE_DATA.byteLength);
         const buf = mod.transfer(ENCRYPTED_SAMPLE_DATA);
         const mac = mod.transfer(ENCRYPTED_SAMPLE_DATA_AD);
         const ad = mod.alloc(SAMPLE_AUTH_TAG_LENGTH);
         const npub = mod.alloc(EXPECTED_NPUBBYTES);
         const k = mod.alloc(EXPECTED_KEYBYTES);
-
         ctx.after(() => {
             buf.free();
             npub.free();
@@ -163,7 +165,7 @@ test("WASM", async (/** @type {import("node:test").TestContext} */ ctx) => {
 
     await testMod(ctx, mod);
 
-    await ctx.test("buffer pointers work even after the WASM memory is invalidated", () => {
+    await ctx.test("buffer pointers work even after the WASM memory is invalidated", ctx => {
         const ptr = mod.transfer(KB_ONES);
         const buf = ptr.buffer;
         ctx.after(() => ptr.free());
