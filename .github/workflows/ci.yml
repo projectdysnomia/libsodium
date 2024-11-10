@@ -1,9 +1,12 @@
 name: Project build
-on: [ pull_request ]
+on:
+  pull_request:
+  release:
+    types: [released]
 
 jobs:
   build:
-    name: Build the project
+    name: ${{ github.event_name == 'release' && 'Build and release' || 'Build' }} the project
     runs-on: ubuntu-latest
 
     steps:
@@ -25,10 +28,13 @@ jobs:
       - name: Package the project
         run: |
             mkdir gha-dist
-            npm pack . --pack-destination gha-dist/
+            npm pack . --pack-destination ${{ runner.temp }}/gha-dist/
       - name: Upload the package as an artifact
         uses: actions/upload-artifact@v4
         with:
           name: packaged-tarball
           path:
-            gha-dist/*.tgz
+            ${{ runner.temp }}/gha-dist/*.tgz
+      - name: Publish the package to NPM
+        if: github.event_name == 'release'
+        run: npm publish --provenance
