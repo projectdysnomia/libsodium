@@ -30,7 +30,8 @@ jobs:
       - name: Install dependencies
         run: npm install --include=peer
       - name: Run the tests
-        run: node --test test.js
+        # we're forcing the spec reporter to get a human friendly output as there's no GHA-specific reporter in node:test
+        run: node --test --test-reporter=spec test.js
       - name: Package the project
         run: |
             mkdir -p ${{ runner.temp }}/gha-dist
