@@ -12,7 +12,7 @@ declare namespace LibSodium {
          * guaranteed to return a valid view into the buffer.
          *
          * It is not recommended to store the returned buffer, as on
-         * WASM the memory allocation may grow, invalidating the 
+         * WASM the memory allocation may grow, invalidating the
          * returned buffer.
          */
         buffer: Buffer;
@@ -74,6 +74,7 @@ declare namespace LibSodium {
      * @param ad Additional data
      * @param npub The public nonce
      * @param k The decryption key
+     * @returns The byte length of the decrypted message
      */
     export function crypto_aead_xchacha20poly1305_ietf_decrypt(m: BufferPointer, nsec: null, c: BufferPointer, ad: BufferPointer | null, npub: BufferPointer, k: BufferPointer): number;
     /**
@@ -95,6 +96,7 @@ declare namespace LibSodium {
      * @param nsec Unused, must be null
      * @param npub Pointer to the public nonce
      * @param k Pointer to the encryption key
+     * @returns The byte length of the length message
      */
     export function crypto_aead_xchacha20poly1305_ietf_encrypt(c: BufferPointer, m: BufferPointer, ad: BufferPointer | null, nsec: null, npub: BufferPointer, k: BufferPointer): number;
     /**
@@ -106,6 +108,7 @@ declare namespace LibSodium {
      * @param nsec Unused, must be null
      * @param npub Pointer to the public nonce
      * @param k Pointer to the encryption key
+     * @returns The byte length of the message authentication code
      */
     export function crypto_aead_xchacha20poly1305_ietf_encrypt_detached(c: BufferPointer, mac: BufferPointer, m: BufferPointer, ad: BufferPointer | null, nsec: null, npub: BufferPointer, k: BufferPointer): number;
     /**
