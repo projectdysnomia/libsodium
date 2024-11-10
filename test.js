@@ -37,6 +37,13 @@ async function testMod(ctx, mod) {
         assert.strict(buf.buffer.equals(KB_ONES), "the buffer is not full of ones");
     });
 
+    await ctx.test("can make a subarray", () => {
+        const buf = mod.transfer(KB_ONES);
+        const sub = buf.subarray(0, 512);
+        assert.strictEqual(sub.buffer.byteLength, 512, "the subarray has incorrect length");
+        assert.strict(sub.buffer.equals(KB_ONES.subarray(0, 512)), "the subarray has incorrect contents");
+    });
+
     await ctx.test("has correct constant values", () => {
         assert.strictEqual(mod.crypto_aead_xchacha20poly1305_ietf_ABYTES, EXPECTED_ABYTES, "ABYTES is incorrect");
         assert.strictEqual(mod.crypto_aead_xchacha20poly1305_ietf_KEYBYTES, EXPECTED_KEYBYTES, "KEYBYTES is incorrect");
@@ -155,4 +162,22 @@ test("WASM", async (/** @type {import("node:test").TestContext} */ ctx) => {
     });
 
     await testMod(ctx, mod);
+
+    await ctx.test("buffer pointers work even after the WASM memory is invalidated", () => {
+        const ptr = mod.transfer(KB_ONES);
+        const buf = ptr.buffer;
+        ctx.after(() => ptr.free());
+
+        const anotherPtr = mod.alloc(1024); // the initial WASM memory is 4 MB, so no references should be invalidated
+        ctx.after(() => anotherPtr.free());
+
+        assert.strictEqual(buf, ptr.buffer, "the buffer cache doesn't work");
+
+        // twice the size of initial WASM memory, keep in sync with scripts/build-libsodium.sh if changed
+        const reallyLargePtr = mod.alloc(8 * (1024 ** 2)); 
+        ctx.after(() => reallyLargePtr.free());
+
+        assert.notStrictEqual(buf, ptr.buffer, "the original buffer is still valid after a really large allocation");
+        assert.strict(ptr.buffer.equals(KB_ONES), "the buffer is not full of ones");
+    });
 });
