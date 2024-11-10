@@ -27,7 +27,7 @@ jobs:
         run: ./scripts/build-libsodium.sh
       - name: Package the project
         run: |
-            mkdir gha-dist
+            mkdir -p ${{ runner.temp }}/gha-dist
             npm pack . --pack-destination ${{ runner.temp }}/gha-dist/
       - name: Upload the package as an artifact
         uses: actions/upload-artifact@v4
