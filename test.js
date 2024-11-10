@@ -143,7 +143,6 @@ async function testMod(ctx, mod) {
 
 
 test("native", async (/** @type {import("node:test").TestContext} */ ctx) => {
-    /** @type {import("./native.js")} */
     const mod = require("./native.js");
 
     await ctx.test("is really native", () => {
