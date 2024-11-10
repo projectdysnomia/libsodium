@@ -47,7 +47,7 @@ jobs:
         with:
           name: libsodium-wasm-build
       - name: Install dependencies
-        run: npm install
+        run: npm install --include=peer
       - name: Run the tests
         # we're forcing the spec reporter to get a human friendly output as there's no GHA-specific reporter in node:test
         run: node --test --test-reporter=spec test.js
