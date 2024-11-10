@@ -8,7 +8,8 @@ jobs:
   build:
     name: ${{ github.event_name == 'release' && 'Build and release' || 'Build' }} the project
     runs-on: ubuntu-latest
-
+    permissions: 
+      id-token: write
     steps:
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -37,4 +38,6 @@ jobs:
             ${{ runner.temp }}/gha-dist/*.tgz
       - name: Publish the package to NPM
         if: github.event_name == 'release'
-        run: npm publish --provenance
+        env:
+          NPM_TOKEN: ${{ github.event_name == 'release' && secrets.NPM_TOKEN || '' }}
+        run: npm publish --provenance --access public
