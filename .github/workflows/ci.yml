@@ -22,7 +22,7 @@ jobs:
       - name: Package the project
         run: |
             mkdir gha-dist
-            npm pack --output gha-dist/
+            npm pack . --pack-destination gha-dist/
       - name: Upload the package as an artifact
         uses: actions/upload-artifact@v4
         with:
