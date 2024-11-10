@@ -17,6 +17,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
+      - name: Print used libsodium revision
+        run: |
+            git -C libsodium rev-parse HEAD
       - name: Build libsodium for WASM
         run: ./scripts/build-libsodium.sh
       - name: Package the project
