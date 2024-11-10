@@ -29,8 +29,7 @@ jobs:
         id: upload-libsodium
         with:
           name: libsodium-wasm-build
-          path:
-            wasm/*
+          path: wasm/
   test:
     name: Test the project
     runs-on: ubuntu-latest
@@ -46,6 +45,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: libsodium-wasm-build
+          path: ${{ github.workspace }}/wasm/
       - name: Install dependencies
         run: npm install --include=peer
       - name: Run the tests
@@ -67,6 +67,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: libsodium-wasm-build
+          path: ${{ github.workspace }}/wasm/
       - name: Package the project
         run: |
             mkdir -p ${{ runner.temp }}/gha-dist
