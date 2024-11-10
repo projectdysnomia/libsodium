@@ -35,6 +35,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 9
+          run_install: false
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with: 
@@ -47,7 +52,7 @@ jobs:
           name: libsodium-wasm-build
           path: ${{ github.workspace }}/wasm/
       - name: Install dependencies
-        run: npm install --include=peer
+        run: pnpm install
       - name: Run the tests
         # we're forcing the spec reporter to get a human friendly output as there's no GHA-specific reporter in node:test
         run: node --test --test-reporter=spec test.js
@@ -82,4 +87,4 @@ jobs:
         if: github.event_name == 'release'
         env:
           NPM_TOKEN: ${{ github.event_name == 'release' && secrets.NPM_TOKEN || '' }}
-        run: npm publish --provenance --access public ${{ runner.temp }}/gha-dist/*.tgz
+        run: npm publish --provenance --access public
