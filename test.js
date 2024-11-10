@@ -13,11 +13,7 @@ const EXPECTED_NSECBYTES = 0;
 
 test("native", async (/** @type {import("node:test").TestContext} */ ctx) => {
     /** @type {import("./native.js")} */
-    let mod;
-
-    await ctx.test("loads", () => {
-        mod = require("./native.js");
-    });
+    const mod = require("./native.js");
 
     await ctx.test("is really native", () => {
         assert.strictEqual(mod.native, true, "module reports itself as non-native");
@@ -44,12 +40,7 @@ test("native", async (/** @type {import("node:test").TestContext} */ ctx) => {
 
 
 test("WASM", async (/** @type {import("node:test").TestContext} */ ctx) => {
-    /** @type {import("./wasm.js")} */
-    let mod;
-
-    await ctx.test("loads", () => {
-        mod = require("./wasm.js");
-    });
+    const mod = require("./wasm.js");
 
     await ctx.test("is really WASM", () => {
         assert.strictEqual(mod.wasm, true, "module reports itself as non-WASM");
