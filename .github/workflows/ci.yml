@@ -28,7 +28,7 @@ jobs:
       - name: Build libsodium for WASM
         run: ./scripts/build-libsodium.sh
       - name: Install dependencies
-        run: npm i
+        run: npm install --include=peer
       - name: Run the tests
         run: node --test test.js
       - name: Package the project
