@@ -43,7 +43,7 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@v4
       - name: Download the WASM binaries
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: libsodium-wasm-build
       - name: Install dependencies
@@ -64,7 +64,7 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@v4
       - name: Download the WASM binaries
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: libsodium-wasm-build
       - name: Package the project
