@@ -1,2 +1,5 @@
 libsodium/
-/build-libsodium.sh
+scripts/
+.github/
+.gitmodules
+test.js

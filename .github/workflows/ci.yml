@@ -1,0 +1,90 @@
+name: Project build
+on:
+  pull_request:
+  release:
+    types: [released]
+
+jobs:
+  build:
+    name: Build the project
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with: 
+          node-version: lts/*
+      - name: Setup Emscripten SDK
+        uses: mymindstorm/setup-emsdk@v14
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Print used libsodium revision
+        run: |
+            git -C libsodium rev-parse HEAD
+      - name: Build libsodium for WASM
+        run: ./scripts/build-libsodium.sh
+      - name: Upload the WASM binaries as an artifact
+        uses: actions/upload-artifact@v4
+        id: upload-libsodium
+        with:
+          name: libsodium-wasm-build
+          path: wasm/
+  test:
+    name: Test the project
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 9
+          run_install: false
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with: 
+          node-version: lts/*
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+      - name: Download the WASM binaries
+        uses: actions/download-artifact@v4
+        with:
+          name: libsodium-wasm-build
+          path: ${{ github.workspace }}/wasm/
+      - name: Install dependencies
+        run: pnpm install
+      - name: Run the tests
+        # we're forcing the spec reporter to get a human friendly output as there's no GHA-specific reporter in node:test
+        run: node --test --test-reporter=spec test.js
+  
+  release:
+    name: ${{ github.event_name == 'release' && 'Release' || 'Pack' }} the project
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with: 
+          node-version: lts/*
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+      - name: Download the WASM binaries
+        uses: actions/download-artifact@v4
+        with:
+          name: libsodium-wasm-build
+          path: ${{ github.workspace }}/wasm/
+      - name: Package the project
+        run: |
+            mkdir -p ${{ runner.temp }}/gha-dist
+            npm pack . --pack-destination ${{ runner.temp }}/gha-dist/
+      - name: Upload the built package as an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-package
+          path:
+            ${{ runner.temp }}/gha-dist/*.tgz
+      - name: Publish the package to NPM
+        if: github.event_name == 'release'
+        env:
+          NPM_TOKEN: ${{ github.event_name == 'release' && secrets.NPM_TOKEN || '' }}
+        run: npm publish --provenance --access public
