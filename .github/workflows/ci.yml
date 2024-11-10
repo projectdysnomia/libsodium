@@ -55,7 +55,7 @@ jobs:
   release:
     name: ${{ github.event_name == 'release' && 'Release' || 'Pack' }} the project
     runs-on: ubuntu-latest
-    needs: [build, test]
+    needs: test
     steps:
       - name: Setup Node.js
         uses: actions/setup-node@v4
