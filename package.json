@@ -1,6 +1,6 @@
 {
   "name": "@projectdysnomia/libsodium",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "A minimal libsodium wrapper for Project Dysnomia",
   "main": "index.js",
   "type": "commonjs",
